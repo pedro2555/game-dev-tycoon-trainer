@@ -99,8 +99,16 @@ namespace GameDevTycoon
         public static string getBlob()
         {
             TryConnect();
-
-            return GetString((byte[])Database.ExecuteScalar(String.Format("SELECT value from ItemTable WHERE key=\"{0}\"", gdtDBHelper.CurrentSlot)));
+            string res = "";
+            try
+            {
+                res = GetString((byte[])Database.ExecuteScalar(String.Format("SELECT value from ItemTable WHERE key=\"{0}\"", gdtDBHelper.CurrentSlot)));
+            }
+            catch (Exception)
+            {
+                return "";
+            }
+            return res;
         }
         /// <summary>
         /// Saves the blob file
@@ -122,13 +130,21 @@ namespace GameDevTycoon
         /// Backups file file__0.localstorage to file__0.localstorage.backup
         /// backup file is overwritten
         /// </summary>
-        public static void BackupDB()
+        public static bool BackupDB()
         {
             if (isGameRunning())
-                return;
-            if (File.Exists(gdtDBHelper.Path.Replace("file__0.localstorage", "file__0.localstorage.backup")))
-                File.Delete(gdtDBHelper.Path.Replace("file__0.localstorage", "file__0.localstorage.backup"));
-            File.Copy(gdtDBHelper.Path, gdtDBHelper.Path.Replace("file__0.localstorage", "file__0.localstorage.backup"));
+                return false;
+            try
+            {
+                if (File.Exists(gdtDBHelper.Path.Replace("file__0.localstorage", "file__0.localstorage.backup")))
+                    File.Delete(gdtDBHelper.Path.Replace("file__0.localstorage", "file__0.localstorage.backup"));
+                File.Copy(gdtDBHelper.Path, gdtDBHelper.Path.Replace("file__0.localstorage", "file__0.localstorage.backup"));
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+            return true;
         }
 
         public static void RestoreDB()
