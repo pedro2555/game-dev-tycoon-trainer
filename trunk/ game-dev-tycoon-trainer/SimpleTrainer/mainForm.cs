@@ -90,7 +90,31 @@ namespace GameDevTycoon
                     }
                 // Design
                 reg1 = new Regex("\\\"dF\":(.*?)\\,");
-
+                foreach (Match m1 in reg1.Matches(m.Groups[1].ToString(), 0))
+                    switch (index)
+                    {
+                        case 0:
+                            txt0Design.Text = m1.Groups[1].ToString();
+                            break;
+                        case 1:
+                            txt1Design.Text = m1.Groups[1].ToString();
+                            break;
+                        case 2:
+                            txt2Design.Text = m1.Groups[1].ToString();
+                            break;
+                        case 3:
+                            txt3Design.Text = m1.Groups[1].ToString();
+                            break;
+                        case 4:
+                            txt4Design.Text = m1.Groups[1].ToString();
+                            break;
+                        case 5:
+                            txt5Design.Text = m1.Groups[1].ToString();
+                            break;
+                        case 6:
+                            txt6Design.Text = m1.Groups[1].ToString();
+                            break;
+                    }
                 index++;
 
             }
