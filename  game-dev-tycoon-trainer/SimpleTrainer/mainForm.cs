@@ -9,16 +9,27 @@ namespace GameDevTycoon
 {
     public partial class mainForm : Form
     {
+        private int maxIndex;
+
         public mainForm()
         {
             InitializeComponent();
             this.Icon = new System.Drawing.Icon(System.Reflection.Assembly.GetExecutingAssembly().GetManifestResourceStream("SimpleTrainer.icon.ico"));
-
+            maxIndex = 0;
         }
 
         public new void Update()
         {
             base.Update();
+
+            foreach(Control c in this.Controls)
+            {
+                if (c.GetType() == typeof(TextBox))
+                {
+                    ((TextBox)c).Text = "";
+                }
+            }
+
             if (gdtDBHelper.isGameRunning())
                 return;
 
@@ -91,7 +102,7 @@ namespace GameDevTycoon
                             break;
                     }
                 // Design
-                reg1 = new Regex("\\\"dF\":(.*?)\\,");
+                reg1 = new Regex("\\,\"dF\":(.*?)\\,");
                 foreach (Match m1 in reg1.Matches(m.Groups[1].ToString(), 0))
                     switch (index)
                     {
@@ -118,7 +129,7 @@ namespace GameDevTycoon
                             break;
                     }
                 // Technology
-                reg1 = new Regex("\\\"tF\":(.*?)\\,");
+                reg1 = new Regex("\\,\"tF\":(.*?)\\,");
                 foreach (Match m1 in reg1.Matches(m.Groups[1].ToString(), 0))
                     switch (index)
                     {
@@ -145,7 +156,7 @@ namespace GameDevTycoon
                             break;
                     }
                 // Speed
-                reg1 = new Regex("\\\"speedF\":(.*?)\\,");
+                reg1 = new Regex("\\,\"speedF\":(.*?)\\,");
                 foreach (Match m1 in reg1.Matches(m.Groups[1].ToString(), 0))
                     switch (index)
                     {
@@ -172,7 +183,7 @@ namespace GameDevTycoon
                             break;
                     }
                 // Research
-                reg1 = new Regex("\\\"researchF\":(.*?)\\,");
+                reg1 = new Regex("\\,\"researchF\":(.*?)\\,");
                 foreach (Match m1 in reg1.Matches(m.Groups[1].ToString(), 0))
                     switch (index)
                     {
@@ -201,6 +212,7 @@ namespace GameDevTycoon
                 index++;
 
             }
+            maxIndex = index;
         }
 
         private bool SaveBlob()
@@ -269,174 +281,178 @@ namespace GameDevTycoon
             reg = new Regex("\\{\"id\":(.*?)\\}");
             foreach (Match m in reg.Matches(blob, startIndex))
             {
+                if (index == maxIndex)
+                    break;
                 // Name
                 Regex reg1 = new Regex("\\,\"name\":\"(.*?)\\\",");
-                foreach (Match m1 in reg1.Matches(m.Groups[1].ToString(), 0))
+                foreach (Match m1 in reg1.Matches(m.ToString(), 0))
                     switch (index)
                     {
                         case 0:
-                            blob = blob.Remove(m.Groups[1].Index, m.Groups[1].Length);
-                            blob = blob.Insert(m.Groups[1].Index, txt0Name.Text);
+                            string s = m1.Groups[1].ToString();
+                            blob = blob.Remove(m.Index + m1.Groups[1].Index, m1.Groups[1].Length);
+                            blob = blob.Insert(m.Index + m1.Groups[1].Index, txt0Name.Text);
                             break;
                         case 1:
-                            blob = blob.Remove(m.Groups[1].Index, m.Groups[1].Length);
-                            blob = blob.Insert(m.Groups[1].Index, txt1Name.Text);
+                            blob = blob.Remove(m.Index + m1.Groups[1].Index, m1.Groups[1].Length);
+                            blob = blob.Insert(m.Index + m1.Groups[1].Index, txt1Name.Text);
                             break;
                         case 2:
-                            blob = blob.Remove(m.Groups[1].Index, m.Groups[1].Length);
-                            blob = blob.Insert(m.Groups[1].Index, txt2Name.Text);
+                            blob = blob.Remove(m.Index + m1.Groups[1].Index, m1.Groups[1].Length);
+                            blob = blob.Insert(m.Index + m1.Groups[1].Index, txt2Name.Text);
                             break;
                         case 3:
-                            blob = blob.Remove(m.Groups[1].Index, m.Groups[1].Length);
-                            blob = blob.Insert(m.Groups[1].Index, txt3Name.Text);
+                            blob = blob.Remove(m.Index + m1.Groups[1].Index, m1.Groups[1].Length);
+                            blob = blob.Insert(m.Index + m1.Groups[1].Index, txt3Name.Text);
                             break;
                         case 4:
-                            blob = blob.Remove(m.Groups[1].Index, m.Groups[1].Length);
-                            blob = blob.Insert(m.Groups[1].Index, txt4Name.Text);
+                            blob = blob.Remove(m.Index + m1.Groups[1].Index, m1.Groups[1].Length);
+                            blob = blob.Insert(m.Index + m1.Groups[1].Index, txt4Name.Text);
                             break;
                         case 5:
-                            blob = blob.Remove(m.Groups[1].Index, m.Groups[1].Length);
-                            blob = blob.Insert(m.Groups[1].Index, txt5Name.Text);
+                            blob = blob.Remove(m.Index + m1.Groups[1].Index, m1.Groups[1].Length);
+                            blob = blob.Insert(m.Index + m1.Groups[1].Index, txt5Name.Text);
                             break;
                         case 6:
-                            blob = blob.Remove(m.Groups[1].Index, m.Groups[1].Length);
-                            blob = blob.Insert(m.Groups[1].Index, txt6Name.Text);
+                            blob = blob.Remove(m.Index + m1.Groups[1].Index, m1.Groups[1].Length);
+                            blob = blob.Insert(m.Index + m1.Groups[1].Index, txt6Name.Text);
                             break;
                     }
                 // Design
-                reg1 = new Regex("\\\"dF\":(.*?)\\,");
-                foreach (Match m1 in reg1.Matches(m.Groups[1].ToString(), 0))
+                reg1 = new Regex("\\,\"dF\":(.*?)\\,");
+                foreach (Match m1 in reg1.Matches(m.ToString(), 0))
                     switch (index)
                     {
                         case 0:
-                            blob = blob.Remove(m.Groups[1].Index, m.Groups[1].Length);
-                            blob = blob.Insert(m.Groups[1].Index, gdtDBHelper.FactorToDouble(Double.Parse(txt0Design.Text.Replace(',', '.'))).ToString());
+                            blob = blob.Remove(m.Index + m1.Groups[1].Index, m1.Groups[1].Length);
+                            blob = blob.Insert(m.Index + m1.Groups[1].Index, gdtDBHelper.FactorToDouble(Double.Parse(txt0Design.Text.Replace(',', '.'))).ToString().Replace(',', '.'));
                             break;
                         case 1:
-                            blob = blob.Remove(m.Groups[1].Index, m.Groups[1].Length);
-                            blob = blob.Insert(m.Groups[1].Index, gdtDBHelper.FactorToDouble(Double.Parse(txt1Design.Text.Replace(',', '.'))).ToString());
+                            blob = blob.Remove(m.Index + m1.Groups[1].Index, m1.Groups[1].Length);
+                            blob = blob.Insert(m.Index + m1.Groups[1].Index, gdtDBHelper.FactorToDouble(Double.Parse(txt1Design.Text.Replace(',', '.'))).ToString().Replace(',', '.'));
                             break;
                         case 2:
-                            blob = blob.Remove(m.Groups[1].Index, m.Groups[1].Length);
-                            blob = blob.Insert(m.Groups[1].Index, gdtDBHelper.FactorToDouble(Double.Parse(txt2Design.Text.Replace(',', '.'))).ToString());
+                            blob = blob.Remove(m.Index + m1.Groups[1].Index, m1.Groups[1].Length);
+                            blob = blob.Insert(m.Index + m1.Groups[1].Index, gdtDBHelper.FactorToDouble(Double.Parse(txt2Design.Text.Replace(',', '.'))).ToString().Replace(',', '.'));
                             break;
                         case 3:
-                            blob = blob.Remove(m.Groups[1].Index, m.Groups[1].Length);
-                            blob = blob.Insert(m.Groups[1].Index, gdtDBHelper.FactorToDouble(Double.Parse(txt3Design.Text.Replace(',', '.'))).ToString());
+                            blob = blob.Remove(m.Index + m1.Groups[1].Index, m1.Groups[1].Length);
+                            blob = blob.Insert(m.Index + m1.Groups[1].Index, gdtDBHelper.FactorToDouble(Double.Parse(txt3Design.Text.Replace(',', '.'))).ToString().Replace(',', '.'));
                             break;
                         case 4:
-                            blob = blob.Remove(m.Groups[1].Index, m.Groups[1].Length);
-                            blob = blob.Insert(m.Groups[1].Index, gdtDBHelper.FactorToDouble(Double.Parse(txt4Design.Text.Replace(',', '.'))).ToString());
+                            blob = blob.Remove(m.Index + m1.Groups[1].Index, m1.Groups[1].Length);
+                            blob = blob.Insert(m.Index + m1.Groups[1].Index, gdtDBHelper.FactorToDouble(Double.Parse(txt4Design.Text.Replace(',', '.'))).ToString().Replace(',', '.'));
                             break;
                         case 5:
-                            blob = blob.Remove(m.Groups[1].Index, m.Groups[1].Length);
-                            blob = blob.Insert(m.Groups[1].Index, gdtDBHelper.FactorToDouble(Double.Parse(txt5Design.Text.Replace(',', '.'))).ToString());
+                            blob = blob.Remove(m.Index + m1.Groups[1].Index, m1.Groups[1].Length);
+                            blob = blob.Insert(m.Index + m1.Groups[1].Index, gdtDBHelper.FactorToDouble(Double.Parse(txt5Design.Text.Replace(',', '.'))).ToString().Replace(',', '.'));
                             break;
                         case 6:
-                            blob = blob.Remove(m.Groups[1].Index, m.Groups[1].Length);
-                            blob = blob.Insert(m.Groups[1].Index, gdtDBHelper.FactorToDouble(Double.Parse(txt6Design.Text.Replace(',', '.'))).ToString());
+                            blob = blob.Remove(m.Index + m1.Groups[1].Index, m1.Groups[1].Length);
+                            blob = blob.Insert(m.Index + m1.Groups[1].Index, gdtDBHelper.FactorToDouble(Double.Parse(txt6Design.Text.Replace(',', '.'))).ToString().Replace(',', '.'));
                             break;
                     }
                 // Technology
-                reg1 = new Regex("\\\"tF\":(.*?)\\,");
-                foreach (Match m1 in reg1.Matches(m.Groups[1].ToString(), 0))
+                reg1 = new Regex("\\,\"tF\":(.*?)\\,");
+                foreach (Match m1 in reg1.Matches(m.ToString(), 0))
                     switch (index)
                     {
                         case 0:
-                            blob = blob.Remove(m.Groups[1].Index, m.Groups[1].Length);
-                            blob = blob.Insert(m.Groups[1].Index, gdtDBHelper.FactorToDouble(Double.Parse(txt0Tech.Text.Replace(',', '.'))).ToString());
+                            string s = m1.Groups[1].ToString();
+                            blob = blob.Remove(m.Index + m1.Groups[1].Index, m1.Groups[1].Length);
+                            blob = blob.Insert(m.Index + m1.Groups[1].Index, gdtDBHelper.FactorToDouble(Double.Parse(txt0Tech.Text.Replace(',', '.'))).ToString().Replace(',', '.'));
                             break;
                         case 1:
-                            blob = blob.Remove(m.Groups[1].Index, m.Groups[1].Length);
-                            blob = blob.Insert(m.Groups[1].Index, gdtDBHelper.FactorToDouble(Double.Parse(txt1Tech.Text.Replace(',', '.'))).ToString());
+                            blob = blob.Remove(m.Index + m1.Groups[1].Index, m1.Groups[1].Length);
+                            blob = blob.Insert(m.Index + m1.Groups[1].Index, gdtDBHelper.FactorToDouble(Double.Parse(txt1Tech.Text.Replace(',', '.'))).ToString().Replace(',', '.'));
                             break;
                         case 2:
-                            blob = blob.Remove(m.Groups[1].Index, m.Groups[1].Length);
-                            blob = blob.Insert(m.Groups[1].Index, gdtDBHelper.FactorToDouble(Double.Parse(txt2Tech.Text.Replace(',', '.'))).ToString());
+                            blob = blob.Remove(m.Index + m1.Groups[1].Index, m1.Groups[1].Length);
+                            blob = blob.Insert(m.Index + m1.Groups[1].Index, gdtDBHelper.FactorToDouble(Double.Parse(txt2Tech.Text.Replace(',', '.'))).ToString().Replace(',', '.'));
                             break;
                         case 3:
-                            blob = blob.Remove(m.Groups[1].Index, m.Groups[1].Length);
-                            blob = blob.Insert(m.Groups[1].Index, gdtDBHelper.FactorToDouble(Double.Parse(txt3Tech.Text.Replace(',', '.'))).ToString());
+                            blob = blob.Remove(m.Index + m1.Groups[1].Index, m1.Groups[1].Length);
+                            blob = blob.Insert(m.Index + m1.Groups[1].Index, gdtDBHelper.FactorToDouble(Double.Parse(txt3Tech.Text.Replace(',', '.'))).ToString().Replace(',', '.'));
                             break;
                         case 4:
-                            blob = blob.Remove(m.Groups[1].Index, m.Groups[1].Length);
-                            blob = blob.Insert(m.Groups[1].Index, gdtDBHelper.FactorToDouble(Double.Parse(txt4Tech.Text.Replace(',', '.'))).ToString());
+                            blob = blob.Remove(m.Index + m1.Groups[1].Index, m1.Groups[1].Length);
+                            blob = blob.Insert(m.Index + m1.Groups[1].Index, gdtDBHelper.FactorToDouble(Double.Parse(txt4Tech.Text.Replace(',', '.'))).ToString().Replace(',', '.'));
                             break;
                         case 5:
-                            blob = blob.Remove(m.Groups[1].Index, m.Groups[1].Length);
-                            blob = blob.Insert(m.Groups[1].Index, gdtDBHelper.FactorToDouble(Double.Parse(txt5Tech.Text.Replace(',', '.'))).ToString());
+                            blob = blob.Remove(m.Index + m1.Groups[1].Index, m1.Groups[1].Length);
+                            blob = blob.Insert(m.Index + m1.Groups[1].Index, gdtDBHelper.FactorToDouble(Double.Parse(txt5Tech.Text.Replace(',', '.'))).ToString().Replace(',', '.'));
                             break;
                         case 6:
-                            blob = blob.Remove(m.Groups[1].Index, m.Groups[1].Length);
-                            blob = blob.Insert(m.Groups[1].Index, gdtDBHelper.FactorToDouble(Double.Parse(txt6Tech.Text.Replace(',', '.'))).ToString());
+                            blob = blob.Remove(m.Index + m1.Groups[1].Index, m1.Groups[1].Length);
+                            blob = blob.Insert(m.Index + m1.Groups[1].Index, gdtDBHelper.FactorToDouble(Double.Parse(txt6Tech.Text.Replace(',', '.'))).ToString().Replace(',', '.'));
                             break;
                     }
                 // Speed
-                reg1 = new Regex("\\\"speedF\":(.*?)\\,");
-                foreach (Match m1 in reg1.Matches(m.Groups[1].ToString(), 0))
+                reg1 = new Regex("\\,\"speedF\":(.*?)\\,");
+                foreach (Match m1 in reg1.Matches(m.ToString(), 0))
                     switch (index)
                     {
                         case 0:
-                            blob = blob.Remove(m.Groups[1].Index, m.Groups[1].Length);
-                            blob = blob.Insert(m.Groups[1].Index, gdtDBHelper.FactorToDouble(Double.Parse(txt0Speed.Text.Replace(',', '.'))).ToString());
+                            blob = blob.Remove(m.Index + m1.Groups[1].Index, m1.Groups[1].Length);
+                            blob = blob.Insert(m.Index + m1.Groups[1].Index, gdtDBHelper.FactorToDouble(Double.Parse(txt0Speed.Text.Replace(',', '.'))).ToString().Replace(',', '.'));
                             break;
                         case 1:
-                            blob = blob.Remove(m.Groups[1].Index, m.Groups[1].Length);
-                            blob = blob.Insert(m.Groups[1].Index, gdtDBHelper.FactorToDouble(Double.Parse(txt1Speed.Text.Replace(',', '.'))).ToString());
+                            blob = blob.Remove(m.Index + m1.Groups[1].Index, m1.Groups[1].Length);
+                            blob = blob.Insert(m.Index + m1.Groups[1].Index, gdtDBHelper.FactorToDouble(Double.Parse(txt1Speed.Text.Replace(',', '.'))).ToString().Replace(',', '.'));
                             break;
                         case 2:
-                            blob = blob.Remove(m.Groups[1].Index, m.Groups[1].Length);
-                            blob = blob.Insert(m.Groups[1].Index, gdtDBHelper.FactorToDouble(Double.Parse(txt2Speed.Text.Replace(',', '.'))).ToString());
+                            blob = blob.Remove(m.Index + m1.Groups[1].Index, m1.Groups[1].Length);
+                            blob = blob.Insert(m.Index + m1.Groups[1].Index, gdtDBHelper.FactorToDouble(Double.Parse(txt2Speed.Text.Replace(',', '.'))).ToString().Replace(',', '.'));
                             break;
                         case 3:
-                            blob = blob.Remove(m.Groups[1].Index, m.Groups[1].Length);
-                            blob = blob.Insert(m.Groups[1].Index, gdtDBHelper.FactorToDouble(Double.Parse(txt3Speed.Text.Replace(',', '.'))).ToString());
+                            blob = blob.Remove(m.Index + m1.Groups[1].Index, m1.Groups[1].Length);
+                            blob = blob.Insert(m.Index + m1.Groups[1].Index, gdtDBHelper.FactorToDouble(Double.Parse(txt3Speed.Text.Replace(',', '.'))).ToString().Replace(',', '.'));
                             break;
                         case 4:
-                            blob = blob.Remove(m.Groups[1].Index, m.Groups[1].Length);
-                            blob = blob.Insert(m.Groups[1].Index, gdtDBHelper.FactorToDouble(Double.Parse(txt4Speed.Text.Replace(',', '.'))).ToString());
+                            blob = blob.Remove(m.Index + m1.Groups[1].Index, m1.Groups[1].Length);
+                            blob = blob.Insert(m.Index + m1.Groups[1].Index, gdtDBHelper.FactorToDouble(Double.Parse(txt4Speed.Text.Replace(',', '.'))).ToString().Replace(',', '.'));
                             break;
                         case 5:
-                            blob = blob.Remove(m.Groups[1].Index, m.Groups[1].Length);
-                            blob = blob.Insert(m.Groups[1].Index, gdtDBHelper.FactorToDouble(Double.Parse(txt5Speed.Text.Replace(',', '.'))).ToString());
+                            blob = blob.Remove(m.Index + m1.Groups[1].Index, m1.Groups[1].Length);
+                            blob = blob.Insert(m.Index + m1.Groups[1].Index, gdtDBHelper.FactorToDouble(Double.Parse(txt5Speed.Text.Replace(',', '.'))).ToString().Replace(',', '.'));
                             break;
                         case 6:
-                            blob = blob.Remove(m.Groups[1].Index, m.Groups[1].Length);
-                            blob = blob.Insert(m.Groups[1].Index, gdtDBHelper.FactorToDouble(Double.Parse(txt6Speed.Text.Replace(',', '.'))).ToString());
+                            blob = blob.Remove(m.Index + m1.Groups[1].Index, m1.Groups[1].Length);
+                            blob = blob.Insert(m.Index + m1.Groups[1].Index, gdtDBHelper.FactorToDouble(Double.Parse(txt6Speed.Text.Replace(',', '.'))).ToString().Replace(',', '.'));
                             break;
                     }
                 // Research
-                reg1 = new Regex("\\\"researchF\":(.*?)\\,");
-                foreach (Match m1 in reg1.Matches(m.Groups[1].ToString(), 0))
+                reg1 = new Regex("\\,\"researchF\":(.*?)\\,");
+                foreach (Match m1 in reg1.Matches(m.ToString(), 0))
                     switch (index)
                     {
                         case 0:
-                            blob = blob.Remove(m.Groups[1].Index, m.Groups[1].Length);
-                            blob = blob.Insert(m.Groups[1].Index, gdtDBHelper.FactorToDouble(Double.Parse(txt0Research.Text.Replace(',', '.'))).ToString());
+                            blob = blob.Remove(m.Index + m1.Groups[1].Index, m1.Groups[1].Length);
+                            blob = blob.Insert(m.Index + m1.Groups[1].Index, gdtDBHelper.FactorToDouble(Double.Parse(txt0Research.Text.Replace(',', '.'))).ToString().Replace(',', '.'));
                             break;
                         case 1:
-                            blob = blob.Remove(m.Groups[1].Index, m.Groups[1].Length);
-                            blob = blob.Insert(m.Groups[1].Index, gdtDBHelper.FactorToDouble(Double.Parse(txt1Research.Text.Replace(',', '.'))).ToString());
+                            blob = blob.Remove(m.Index + m1.Groups[1].Index, m1.Groups[1].Length);
+                            blob = blob.Insert(m.Index + m1.Groups[1].Index, gdtDBHelper.FactorToDouble(Double.Parse(txt1Research.Text.Replace(',', '.'))).ToString().Replace(',', '.'));
                             break;
                         case 2:
-                            blob = blob.Remove(m.Groups[1].Index, m.Groups[1].Length);
-                            blob = blob.Insert(m.Groups[1].Index, gdtDBHelper.FactorToDouble(Double.Parse(txt2Research.Text.Replace(',', '.'))).ToString());
+                            blob = blob.Remove(m.Index + m1.Groups[1].Index, m1.Groups[1].Length);
+                            blob = blob.Insert(m.Index + m1.Groups[1].Index, gdtDBHelper.FactorToDouble(Double.Parse(txt2Research.Text.Replace(',', '.'))).ToString().Replace(',', '.'));
                             break;
                         case 3:
-                            blob = blob.Remove(m.Groups[1].Index, m.Groups[1].Length);
-                            blob = blob.Insert(m.Groups[1].Index, gdtDBHelper.FactorToDouble(Double.Parse(txt3Research.Text.Replace(',', '.'))).ToString());
+                            blob = blob.Remove(m.Index + m1.Groups[1].Index, m1.Groups[1].Length);
+                            blob = blob.Insert(m.Index + m1.Groups[1].Index, gdtDBHelper.FactorToDouble(Double.Parse(txt3Research.Text.Replace(',', '.'))).ToString().Replace(',', '.'));
                             break;
                         case 4:
-                            blob = blob.Remove(m.Groups[1].Index, m.Groups[1].Length);
-                            blob = blob.Insert(m.Groups[1].Index, gdtDBHelper.FactorToDouble(Double.Parse(txt4Research.Text.Replace(',', '.'))).ToString());
+                            blob = blob.Remove(m.Index + m1.Groups[1].Index, m1.Groups[1].Length);
+                            blob = blob.Insert(m.Index + m1.Groups[1].Index, gdtDBHelper.FactorToDouble(Double.Parse(txt4Research.Text.Replace(',', '.'))).ToString().Replace(',', '.'));
                             break;
                         case 5:
-                            blob = blob.Remove(m.Groups[1].Index, m.Groups[1].Length);
-                            blob = blob.Insert(m.Groups[1].Index, gdtDBHelper.FactorToDouble(Double.Parse(txt5Research.Text.Replace(',', '.'))).ToString());
+                            blob = blob.Remove(m.Index + m1.Groups[1].Index, m1.Groups[1].Length);
+                            blob = blob.Insert(m.Index + m1.Groups[1].Index, gdtDBHelper.FactorToDouble(Double.Parse(txt5Research.Text.Replace(',', '.'))).ToString().Replace(',', '.'));
                             break;
                         case 6:
-                            blob = blob.Remove(m.Groups[1].Index, m.Groups[1].Length);
-                            blob = blob.Insert(m.Groups[1].Index, gdtDBHelper.FactorToDouble(Double.Parse(txt6Research.Text.Replace(',', '.'))).ToString());
+                            blob = blob.Remove(m.Index + m1.Groups[1].Index, m1.Groups[1].Length);
+                            blob = blob.Insert(m.Index + m1.Groups[1].Index, gdtDBHelper.FactorToDouble(Double.Parse(txt6Research.Text.Replace(',', '.'))).ToString().Replace(',', '.'));
                             break;
                     }
                 index++;
@@ -497,8 +513,16 @@ namespace GameDevTycoon
 
         private void cmbSlot_SelectedIndexChanged(object sender, EventArgs e)
         {
-            gdtDBHelper.CurrentSlot = cmbSlot.SelectedItem.ToString();
-            Update();
+            try
+            {
+                gdtDBHelper.CurrentSlot = cmbSlot.SelectedItem.ToString();
+                Update();
+            }
+            catch (Exception)
+            {
+
+
+            }
         }
 
         private void btnRestoreDB_Click(object sender, EventArgs e)
